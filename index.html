@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="theme-color" content="#080c14">
+  <meta name="description" content="Personal Habit Formation & Discipline Portal. GRIND TODAY. SHINE TOMORROW.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Grind & Shine">
+
+  <title>PROJECT GRIND & SHINE | Habit Formation & Discipline Portal</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/svg+xml" href="./assets/icons/icon.svg">
+  <link rel="apple-touch-icon" href="./assets/icons/icon-192.png">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="./css/themes.css">
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="./css/responsive.css">
+</head>
+<body>
+
+  <!-- Top App Header -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand-wrap">
+        <h1 class="brand-title">
+          <span>⚡</span> PROJECT GRIND &amp; SHINE
+        </h1>
+        <span class="brand-tagline">GRIND TODAY. SHINE TOMORROW.</span>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-sm btn-primary" onclick="UI.openHabitModal()" aria-label="Add New Habit">+ NEW</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Optional PWA Install Banner -->
+  <div id="pwa-install-banner" class="pwa-banner" style="display:none; max-width: 900px; margin: 10px auto;">
+    <span class="pwa-banner-text">Install Project Grind &amp; Shine for offline mission command.</span>
+    <button id="btn-pwa-install" class="btn btn-xs btn-primary">INSTALL PWA</button>
+  </div>
+
+  <!-- Habit Limit Warning Banner -->
+  <div id="today-habit-limit-banner" style="display:none; max-width: 900px; margin: 10px auto 0 auto; padding: 0 1rem;"></div>
+
+  <!-- SCREEN 1: TODAY -->
+  <main id="screen-today" class="app-screen active">
+    <!-- Top Mission Status Bar -->
+    <div class="card today-summary-bar">
+      <div class="summary-top-row">
+        <span id="today-display-date" class="mission-date-label">30 SEPTEMBER 2026</span>
+        <span class="score-badge">DAILY SCORE: <strong id="today-score-val">0%</strong></span>
+      </div>
+      <div class="progress-track-lg">
+        <div id="today-progress-bar" class="progress-fill-lg" style="width: 0%;"></div>
+      </div>
+      <div class="summary-stats-text">
+        <span id="today-progress-text">0 / 0 COMPLETE (0%)</span>
+        <span class="mono" style="color: var(--accent-gold); font-weight: 700;">DON'T MISS TWICE.</span>
+      </div>
+    </div>
+
+    <!-- Motivational Command Banner -->
+    <div class="card motivation-banner">
+      <div id="today-motivation-headline" class="motivation-headline">DISCIPLINE OVER MOTIVATION.</div>
+      <div id="today-motivation-subtext" class="motivation-subtext">Show up. Execute the targets. No excuses, no negotiations.</div>
+      <div id="today-principle-text" class="discipline-principle">"Don't negotiate with the plan."</div>
+    </div>
+
+    <!-- Active Habits List for Today -->
+    <div id="today-habits-container" class="today-grid">
+      <!-- Habit Cards Injected via UI.renderTodayScreen() -->
+    </div>
+
+    <!-- Daily Reflection Journal Entry -->
+    <div class="card daily-journal-card">
+      <div class="card-header">
+        <span class="card-tag">DAILY MISSION DEBRIEF</span>
+        <span class="card-date">TODAY'S JOURNAL</span>
+      </div>
+      <textarea id="today-daily-journal-input" class="journal-textarea" placeholder="Record tactical reflection, obstacles overcome, or notes for today..."></textarea>
+      <div style="display: flex; justify-content: flex-end;">
+        <button class="btn btn-sm btn-outline" onclick="UI.saveDailyReflection()">SAVE REFLECTION</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- SCREEN 2: DASHBOARD -->
+  <main id="screen-dashboard" class="app-screen">
+    <div id="dashboard-content">
+      <!-- Injected via Dashboard.renderDashboard() -->
+    </div>
+  </main>
+
+  <!-- SCREEN 3: HISTORY -->
+  <main id="screen-history" class="app-screen">
+    <!-- Filter Tabs -->
+    <div class="filter-tabs-row">
+      <button class="filter-pill" data-filter="7" onclick="UI.setHistoryFilter('7')">7 DAYS</button>
+      <button class="filter-pill active" data-filter="30" onclick="UI.setHistoryFilter('30')">30 DAYS</button>
+      <button class="filter-pill" data-filter="90" onclick="UI.setHistoryFilter('90')">90 DAYS</button>
+      <button class="filter-pill" data-filter="365" onclick="UI.setHistoryFilter('365')">1 YEAR</button>
+      <button class="filter-pill" data-filter="all" onclick="UI.setHistoryFilter('all')">ALL</button>
+    </div>
+
+    <div class="form-group" style="margin-bottom: 1.2rem;">
+      <label for="history-habit-filter">Scope By Habit:</label>
+      <select id="history-habit-filter" class="input-text">
+        <option value="all">ALL HABITS</option>
+      </select>
+    </div>
+
+    <!-- Heatmap Card -->
+    <div id="history-heatmap-container"></div>
+
+    <!-- Historical Log Entries -->
+    <div id="history-entries-list"></div>
+  </main>
+
+  <!-- SCREEN 4: HABIT MANAGER -->
+  <main id="screen-habits" class="app-screen">
+    <div class="card" style="margin-bottom: 1.2rem;">
+      <div class="card-header">
+        <span class="card-tag">HABIT MANAGEMENT COMMAND</span>
+        <span id="habits-count-badge" class="badge badge-gold">0 / 20 ACTIVE</span>
+      </div>
+      <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 10px;">
+        Maintain a focused arsenal of up to 20 active habits. Archive completed or resting habits without losing your historical streaks and records.
+      </p>
+      <button class="btn btn-primary" onclick="UI.openHabitModal()">+ CONFIGURE NEW HABIT</button>
+    </div>
+
+    <h3 style="font-size: 0.9rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px;">Active Operational Habits</h3>
+    <div id="habits-active-list"></div>
+
+    <h3 style="font-size: 0.9rem; text-transform: uppercase; color: var(--text-muted); margin: 1.5rem 0 8px 0;">Archived Habits (Historical Data Retained)</h3>
+    <div id="habits-archived-list"></div>
+  </main>
+
+  <!-- SCREEN 5: SETTINGS -->
+  <main id="screen-settings" class="app-screen">
+    <!-- Theme & Preferences -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-tag">INTERFACE &amp; THEME</span>
+      </div>
+      <div class="form-group">
+        <label for="settings-theme-select">Visual Display Mode</label>
+        <select id="settings-theme-select" class="input-text">
+          <option value="dark">DARK (TACTICAL COMMAND - DEFAULT)</option>
+          <option value="light">LIGHT (FIELD OPERATIONAL)</option>
+          <option value="system">FOLLOW SYSTEM SETTINGS</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Data Export -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-tag">DATA EXPORT &amp; REPORTING</span>
+        <span class="badge badge-gold">CLIENT-SIDE</span>
+      </div>
+      <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 12px;">
+        Export your complete operational logs for independent verification and offline spreadsheet analysis.
+      </p>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+        <button class="btn btn-outline" onclick="Exporter.exportCSV()">DOWNLOAD CSV EXPORT</button>
+        <button class="btn btn-outline" onclick="Exporter.exportExcel()">DOWNLOAD MULTI-SHEET EXCEL (.XLS)</button>
+      </div>
+    </div>
+
+    <!-- Backup & Restore -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-tag">DATABASE BACKUP &amp; RESTORE</span>
+        <span class="card-date">LAST: <strong id="settings-last-backup">Never</strong></span>
+      </div>
+      <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 12px;">
+        Your habit records live exclusively in your browser's IndexedDB. Export periodic JSON backups to preserve your data across devices.
+      </p>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1rem;">
+        <button class="btn btn-primary" onclick="Backup.exportBackupJSON()">EXPORT BACKUP (JSON)</button>
+        <label class="btn btn-outline" style="cursor: pointer;">
+          RESTORE FROM JSON
+          <input type="file" accept=".json" style="display:none;" onchange="UI.handleBackupFileSelect(this)">
+        </label>
+      </div>
+    </div>
+
+    <!-- GitHub Manual Repository Backup Guide -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-tag">GITHUB BACKUP PROTOCOL</span>
+        <span class="badge badge-subtle">MANUAL &amp; SECURE</span>
+      </div>
+      <p style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.5; margin-bottom: 10px;">
+        To maintain long-term archives without transmitting tokens or storing API keys in client-side code:
+      </p>
+      <ol style="font-size: 0.8rem; color: var(--text-secondary); margin-left: 1.2rem; line-height: 1.6;">
+        <li>Click <strong>EXPORT BACKUP (JSON)</strong> to save your current database.</li>
+        <li>Rename the downloaded file to <code>habits-backup.json</code>.</li>
+        <li>Commit and push the file to your private GitHub repository under <code>/backup/habits-backup.json</code>.</li>
+        <li>When switching devices or rebuilding your local database, simply load that JSON file via <strong>RESTORE FROM JSON</strong>.</li>
+      </ol>
+    </div>
+
+    <!-- Data Reset -->
+    <div class="card" style="border-color: rgba(239, 68, 68, 0.4);">
+      <div class="card-header">
+        <span class="card-tag" style="color: var(--accent-red);">DANGER ZONE</span>
+        <span class="badge badge-danger">IRREVERSIBLE</span>
+      </div>
+      <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 12px;">
+        Permanently wipe all habits, daily tracking records, and settings from this browser. You will be prompted to download an export backup first.
+      </p>
+      <button class="btn btn-danger" onclick="UI.resetApplicationData()">WIPE ALL LOCAL DATA</button>
+    </div>
+
+    <!-- About Section -->
+    <div class="card" style="text-align: center; padding: 1.8rem 1rem;">
+      <h3 style="color: var(--accent-gold); font-size: 1.15rem; margin-bottom: 4px;">PROJECT GRIND &amp; SHINE</h3>
+      <p style="font-size: 0.76rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">GRIND TODAY. SHINE TOMORROW. • DON'T MISS TWICE.</p>
+      <p style="font-size: 0.78rem; color: var(--text-secondary); max-width: 500px; margin: 0 auto 10px auto;">
+        A single-user personal discipline command center. Zero backend, zero login, zero third-party tracking. Powered by IndexedDB and Service Worker technology for total offline autonomy.
+      </p>
+      <span class="mono" style="font-size: 0.72rem; color: var(--text-subtle);">VERSION 1.0.0 • GITHUB PAGES READY</span>
+    </div>
+  </main>
+
+  <!-- Floating Action Button -->
+  <button id="fab-add-habit" class="fab-btn" aria-label="Add New Habit">+</button>
+
+  <!-- Bottom Navigation Dock -->
+  <nav class="bottom-nav">
+    <div class="nav-item active" data-tab="today">
+      <span class="nav-icon">🎯</span>
+      <span>TODAY</span>
+    </div>
+    <div class="nav-item" data-tab="dashboard">
+      <span class="nav-icon">📊</span>
+      <span>DASHBOARD</span>
+    </div>
+    <div class="nav-item" data-tab="history">
+      <span class="nav-icon">📅</span>
+      <span>HISTORY</span>
+    </div>
+    <div class="nav-item" data-tab="habits">
+      <span class="nav-icon">📋</span>
+      <span>HABITS</span>
+    </div>
+    <div class="nav-item" data-tab="settings">
+      <span class="nav-icon">⚙️</span>
+      <span>SETTINGS</span>
+    </div>
+  </nav>
+
+  <!-- MODAL: ADD / EDIT HABIT -->
+  <div id="habit-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="habit-modal-title" class="modal-title">CONFIGURE NEW HABIT</h3>
+        <button class="btn-close-modal" onclick="UI.closeModal('habit-modal')">&times;</button>
+      </div>
+
+      <form onsubmit="event.preventDefault(); UI.saveHabitFromModal();">
+        <div class="form-group">
+          <label for="modal-habit-name">Habit Name *</label>
+          <input type="text" id="modal-habit-name" class="input-text" placeholder="e.g. Physical Training" maxlength="100" required>
+        </div>
+
+        <div class="form-group">
+          <label>Habit Icon</label>
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+            <span id="modal-selected-icon" style="font-size: 1.8rem; background: var(--surface-input); border: 1px solid var(--border-card); border-radius: var(--radius-sm); padding: 4px 10px;">🏋️</span>
+            <span class="form-hint">Choose from tactical presets below:</span>
+          </div>
+          <div class="icon-picker-grid">
+            <span class="icon-option" onclick="document.getElementById('modal-selected-icon').textContent = '🏋️'">🏋️</span>
+            <span class="icon-option" onclick="document.getElementById('modal-selected-icon').textContent = '📚'">📚</span>
+            <span class="icon-option" onclick="document.getElementById('modal-selected-icon').textContent = '🎸'">🎸</span>
+            <span class="icon-option" onclick="document.getElementById('modal-selected-icon').textContent = '🧘'">🧘</span>
+            <span class="icon-option" onclick="document.getElementById('modal-selected-icon').textContent = '🏃'">🏃</span>
+            <span class="icon-option" onclick="document.getElementById('modal-selected-icon').textContent = '💧'">💧</span>
+            <span class="icon-option" onclick="document.getElementById('modal-selected-icon').textContent = '🛌'">🛌</span>
+            <span class="icon-option" onclick="document.getElementById('modal-selected-icon').textContent = '🧠'">🧠</span>
+            <span class="icon-option" onclick="document.getElementById('modal-selected-icon').textContent = '💼'">💼</span>
+            <span class="icon-option" onclick="document.getElementById('modal-selected-icon').textContent = '💻'">💻</span>
+            <span class="icon-option" onclick="document.getElementById('modal-selected-icon').textContent = '📝'">📝</span>
+            <span class="icon-option" onclick="document.getElementById('modal-selected-icon').textContent = '🎯'">🎯</span>
+            <span class="icon-option" onclick="document.getElementById('modal-selected-icon').textContent = '🔥'">🔥</span>
+            <span class="icon-option" onclick="document.getElementById('modal-selected-icon').textContent = '❤️'">❤️</span>
+            <span class="icon-option" onclick="document.getElementById('modal-selected-icon').textContent = '🌅'">🌅</span>
+            <span class="icon-option" onclick="document.getElementById('modal-selected-icon').textContent = '🚶'">🚶</span>
+            <span class="icon-option" onclick="document.getElementById('modal-selected-icon').textContent = '🥗'">🥗</span>
+            <span class="icon-option" onclick="document.getElementById('modal-selected-icon').textContent = '🧹'">🧹</span>
+            <span class="icon-option" onclick="document.getElementById('modal-selected-icon').textContent = '💰'">💰</span>
+            <span class="icon-option" onclick="document.getElementById('modal-selected-icon').textContent = '⭐'">⭐</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="modal-habit-color">Tactical Accent Colour</label>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="color" id="modal-habit-color" value="#f59e0b" style="width: 44px; height: 38px; border: none; background: transparent; cursor: pointer;">
+            <span class="form-hint">Used for progress bars, charts, and card accents.</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="modal-habit-type">Habit Type</label>
+          <select id="modal-habit-type" class="input-text" onchange="UI.toggleHabitTypeInputs(this.value)">
+            <option value="boolean">BOOLEAN (YES / NO - 100% or 0%)</option>
+            <option value="numeric">NUMERIC (Target quantity, e.g. pages, reps)</option>
+            <option value="duration">DURATION (Target time in minutes)</option>
+          </select>
+        </div>
+
+        <div id="modal-target-group" class="form-group" style="display:none;">
+          <label for="modal-habit-target">Daily Target Value *</label>
+          <input type="number" id="modal-habit-target" class="input-text" min="1" value="30">
+        </div>
+
+        <div id="modal-unit-group" class="form-group" style="display:none;">
+          <label for="modal-habit-unit">Measurement Unit</label>
+          <input type="text" id="modal-habit-unit" class="input-text" placeholder="e.g. pages, reps, km" value="pages">
+        </div>
+
+        <div class="form-group">
+          <label>Operational Frequency</label>
+          <div style="display: flex; gap: 16px; margin-bottom: 6px;">
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+              <input type="radio" name="modal-freq" id="modal-freq-daily" checked onchange="document.getElementById('modal-weekdays-picker').style.display='none'">
+              <span>EVERY DAY</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+              <input type="radio" name="modal-freq" id="modal-freq-weekdays" onchange="document.getElementById('modal-weekdays-picker').style.display='flex'">
+              <span>SELECTED WEEKDAYS</span>
+            </label>
+          </div>
+
+          <div id="modal-weekdays-picker" class="weekday-checkbox-row" style="display:none;">
+            <label class="weekday-pill"><input type="checkbox" id="modal-day-1" checked> Mon</label>
+            <label class="weekday-pill"><input type="checkbox" id="modal-day-2" checked> Tue</label>
+            <label class="weekday-pill"><input type="checkbox" id="modal-day-3" checked> Wed</label>
+            <label class="weekday-pill"><input type="checkbox" id="modal-day-4" checked> Thu</label>
+            <label class="weekday-pill"><input type="checkbox" id="modal-day-5" checked> Fri</label>
+            <label class="weekday-pill"><input type="checkbox" id="modal-day-6"> Sat</label>
+            <label class="weekday-pill"><input type="checkbox" id="modal-day-0"> Sun</label>
+          </div>
+          <span class="form-hint">Unscheduled days do NOT break your streak.</span>
+        </div>
+
+        <div class="form-group">
+          <label for="modal-habit-desc">Description / Standard</label>
+          <textarea id="modal-habit-desc" class="input-text" rows="2" placeholder="e.g. 45 minutes of deliberate physical training before work."></textarea>
+        </div>
+
+        <!-- Optional Subhabits Checklist Builder -->
+        <div class="form-group">
+          <label>Optional Sub-Habit Checklist Components</label>
+          <div id="modal-subhabits-list"></div>
+          <button type="button" class="btn btn-xs btn-outline" onclick="UI.addSubhabitInputRow()">+ ADD SUB-HABIT COMPONENT</button>
+          <span class="form-hint">Sub-habits are checklist components of the daily mission.</span>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" onclick="UI.closeModal('habit-modal')">CANCEL</button>
+          <button type="submit" class="btn btn-primary">SAVE HABIT</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: EDIT HISTORICAL ENTRY -->
+  <div id="entry-edit-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="entry-edit-title" class="modal-title">EDIT HISTORICAL RECORD</h3>
+        <button class="btn-close-modal" onclick="UI.closeModal('entry-edit-modal')">&times;</button>
+      </div>
+      <div id="entry-edit-content"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: DAY DETAILS (FROM HEATMAP) -->
+  <div id="day-details-modal" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="day-details-title" class="modal-title">MISSION LOG</h3>
+        <button class="btn-close-modal" onclick="UI.closeModal('day-details-modal')">&times;</button>
+      </div>
+      <div id="day-details-body"></div>
+    </div>
+  </div>
+
+  <!-- Application Scripts -->
+  <script src="./js/utils.js"></script>
+  <script src="./js/db.js"></script>
+  <script src="./js/habits.js"></script>
+  <script src="./js/entries.js"></script>
+  <script src="./js/streaks.js"></script>
+  <script src="./js/motivation.js"></script>
+  <script src="./js/analytics.js"></script>
+  <script src="./js/dashboard.js"></script>
+  <script src="./js/export.js"></script>
+  <script src="./js/backup.js"></script>
+  <script src="./js/ui.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>

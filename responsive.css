@@ -1,0 +1,134 @@
+/**
+ * PROJECT GRIND & SHINE
+ * Mobile-First Responsive Breakpoints & Device Adaptations
+ * Target screens: 360px, 390px, 412px, 430px (Android) + Tablet & Desktop.
+ */
+
+/* Extra Small Android Screens (<= 380px) */
+@media (max-width: 380px) {
+  .brand-title {
+    font-size: 1rem;
+  }
+  
+  .brand-tagline {
+    font-size: 0.62rem;
+  }
+
+  .stat-highlight-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .consistency-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .value-stepper {
+    min-width: 100%;
+  }
+
+  .numeric-controls, .duration-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .numeric-controls .btn, .duration-controls .btn {
+    width: 100%;
+  }
+
+  .nav-item {
+    padding: 6px 8px;
+    font-size: 0.62rem;
+  }
+
+  .nav-icon {
+    font-size: 1.2rem;
+  }
+}
+
+/* Standard Android Smartphones (381px - 600px) */
+@media (min-width: 381px) and (max-width: 600px) {
+  .stat-highlight-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .consistency-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Tablet & Intermediate Viewports (601px - 899px) */
+@media (min-width: 601px) {
+  .app-screen {
+    padding: 1.5rem 1.2rem 3rem 1.2rem;
+  }
+
+  .stat-grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .habit-manager-card {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .habit-manager-actions {
+    border-top: none;
+    padding-top: 0;
+  }
+}
+
+/* Desktop Screens (>= 900px) */
+@media (min-width: 900px) {
+  body {
+    padding-bottom: 30px; /* On desktop, bottom bar can be pinned or top navigation */
+  }
+
+  .app-header {
+    padding: 1.2rem 2rem;
+  }
+
+  .brand-title {
+    font-size: 1.35rem;
+  }
+
+  .brand-tagline {
+    font-size: 0.75rem;
+  }
+
+  /* Desktop Multi-column Layouts */
+  .today-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+
+  .dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.2rem;
+  }
+
+  .dashboard-grid .card:nth-child(1),
+  .dashboard-grid .card:nth-child(5),
+  .dashboard-grid .card:nth-child(6) {
+    grid-column: span 2;
+  }
+
+  /* Bottom Navigation converts to clean fixed bottom command dock or desktop bar */
+  .bottom-nav {
+    max-width: 600px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: var(--radius-full);
+    bottom: 18px;
+    height: 60px;
+    border: 1px solid var(--border-card);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .fab-btn {
+    bottom: 30px;
+    right: 40px;
+  }
+}
